@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type="text/css">
+        body {
+            margin: 0;
+            overflow: auto;
+        }
+        .infinite-list-container {
+            margin: 0 auto;
+            width: 500px;
+            position: relative;
+            height: 530px;
+            overflow: scroll;
+        }
+        .infinite-list {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            text-align: center;
+        }
+        .infinite-list-item {
+            box-sizing: border-box;
+            height: 50px;
+            color: #555;
+            border-bottom: 2px solid #999;
+            font-size: 30px;
+        }
+        .infinite-list-phantom {
+            position: absolute;
+            left: 0;
+            top: 0;
+            right: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="infinite-list-container">
+        <div class="infinite-list-phantom"></div>
+        <div class="infinite-list">
+          <!-- item-1 -->
+          <!-- item-2 -->
+          <!-- ...... -->
+          <!-- item-n -->
+        </div>
+    </div>
+    <button id="button">button</button>
+    <script type="text/javascript">
+        function genData(n) {
+            const arr = [];
+            for (let i = 0; i < n; i++) {
+                arr.push(i);
+            }
+            return arr;
+        }
+        const n = 1000;
+        const list = genData(n);
+        const itemHeight = 50;
+        const screenHeight = 530;
+        const container = document.querySelector('.infinite-list-container');
+        const listEl = document.querySelector('.infinite-list');
+        const phantomEl = document.querySelector('.infinite-list-phantom');
+        phantomEl.style.height = n * itemHeight + 'px';
+        const visibleCount = Math.ceil(screenHeight / itemHeight);
+        const listContainer = document.querySelector('.infinite-list-container');
+let start = 0;
+let end = visibleCount;
+let offset = 0;
+        function render(start, end, offset) {
+            const visibleData = list.slice(start, end);
+            listEl.innerHTML = '';
+            visibleData.forEach(val => {
+                const div = document.createElement('div');
+                div.classList.add('infinite-list-item')
+                div.innerText = val;
+                listEl.appendChild(div);
+            });
+            listEl.style.transform = `translateY(${offset}px)`;
+        }
+
+        render(start, end, offset);
+
+        container.addEventListener('scroll', onScroll);
+
+        function onScroll() {
+            const { scrollTop } = container;
+            const newStart = Math.floor(scrollTop / itemHeight);
+            const newEnd = start + visibleCount;
+            const newOffset = scrollTop - (scrollTop % itemHeight);
+            if (start === newStart && end === newEnd && offset === newOffset) return;
+            start = newStart;
+            end = newEnd;
+            offset = newOffset;
+            render(newStart, newEnd, newOffset);
+        }
+
+    </script>
+</body>
+</html>
